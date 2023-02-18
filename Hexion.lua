@@ -3288,6 +3288,7 @@ soundService = game:GetService("SoundService")
 teams = game:GetService("Teams")
 starterPlayer = game:GetService("StarterPlayer")
 insertService = game:GetService("InsertService")
+virtualUser = game:GetService("VirtualUser")
 chatService = game:GetService("Chat")
 proximityPromptService = game:GetService("ProximityPromptService")
 statsService = game:GetService("Stats")
@@ -3310,9 +3311,18 @@ local window = flux:Window("HEXION", games.current, Color3.fromRGB(	153, 0, 0), 
 local tabs = {}
 local toggles = {}
 tabs.universal = window:Tab("UNIVERSAL")
-tabs.universal:Toggle("anti idle/afk", "prevent being kicked for being idle.", function(t)
-    
+
+player.Idled:connect(function()
+    if toggles["anti-afk"] then
+        virtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        wait(1)
+        virtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    end
 end)
+tabs.universal:Toggle("anti idle/afk", "prevent being kicked for being idle.", function(state)
+    toggles["anti-afk"] = state
+end)
+
 tabs.universal:Button("force disconnect (unsafe)", "prevent saving data.", function()
     flux:Notification("disconencted from server!", "CONTINUE")
     wait(1)
@@ -3359,9 +3369,9 @@ if placeId == 6284583030 or placeId == 10321372166 or placeId == 7722306047 then
     tabs.farming:Toggle("auto collect orbs", "automatically collect coins.", false, function(state)
         toggles["auto-collect-orbs"] = state
     end)
-        tabs.farming:Toggle("auto collect lootbags", "automatically collect lootbags.", false, function(state)
+    tabs.farming:Toggle("auto collect lootbags", "automatically collect lootbags.", false, function(state)
         toggles["auto-collect-lootbags"] = state
-        end)
+    end)
 
     tabs.modeSwitch = window:Tab("GAME OPTIONS")
     local modes = {
