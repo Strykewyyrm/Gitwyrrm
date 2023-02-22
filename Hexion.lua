@@ -1,7 +1,12 @@
-do -- flux ui library
+--[[
+	Script Information
+]]
+
+-- Flux UI Library (Modified)
+do
     local temp = "   "
     Flux = {RainbowColorValue = 0, HueSelectionPosition = 0}
-    local PresetColor = Color3.fromRGB(66, 134, 255)
+    local PresetColor = Color3.fromRGB(66, 255, 255)
     local UserInputService = game:GetService("UserInputService")
     local TweenService = game:GetService("TweenService")
     local RunService = game:GetService("RunService")
@@ -226,6 +231,7 @@ do -- flux ui library
     				v:Destroy()
     			end
     		end
+    		local notif = {}
     		local NotificationBase = Instance.new("TextButton")
     		local NotificationBaseCorner = Instance.new("UICorner")
     		local NotificationFrame = Instance.new("Frame")
@@ -337,10 +343,8 @@ do -- flux ui library
     				{TextTransparency = 0.3}
     			):Play()
     		end)
-    
-    		CloseBtn.MouseButton1Click:Connect(function()
-    
-    			TweenService:Create(
+            function notif:Hide()
+                TweenService:Create(
     				NotificationDesc,
     				TweenInfo.new(.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     				{TextTransparency = 1}
@@ -375,7 +379,10 @@ do -- flux ui library
     
     			wait(.2)
     
-    			NotificationBase.Visible = false
+    			NotificationBase.Visible = false    
+            end
+    		CloseBtn.MouseButton1Click:Connect(function()
+    		    notif:Hide()
     		end)
     
     
@@ -410,6 +417,7 @@ do -- flux ui library
     			TweenInfo.new(.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     			{BackgroundTransparency = 0}
     		):Play()
+    		return notif
     	end
     	local Tabs = {}
     	function Tabs:ChangeToggleKey(key)
@@ -3264,128 +3272,223 @@ do -- flux ui library
     end
 end
 
--- variables
-flux = Flux
-players = game:GetService("Players")
-player = players.LocalPlayer
-userId = player.UserId
-mouse = player:GetMouse()
-userInputService = game:GetService("UserInputService")
-tweenService = game:GetService("TweenService")
-httpService = game:GetService("HttpService")
-marketplaceService = game:GetService("MarketplaceService")
-runService = game:GetService("RunService")
-teleportService = game:GetService("TeleportService")
-starterGui = game:GetService("StarterGui")
-guiService = game:GetService("GuiService")
-lighting = game:GetService("Lighting")
-contextActionService = game:GetService("ContextActionService")
-networkClient = game:GetService("NetworkClient")
-replicatedStorage = game:GetService("ReplicatedStorage")
-groupService = game:GetService("GroupService")
-pathService = game:GetService("PathfindingService")
-soundService = game:GetService("SoundService")
-teams = game:GetService("Teams")
-starterPlayer = game:GetService("StarterPlayer")
-insertService = game:GetService("InsertService")
-virtualUser = game:GetService("VirtualUser")
-chatService = game:GetService("Chat")
-proximityPromptService = game:GetService("ProximityPromptService")
-statsService = game:GetService("Stats")
-placeId = game.PlaceId
-jobId = game.JobId
+--[[
+	Hexion Main Script
+]]
 
-foreach = table.foreach
-fmt = string.format
+local Roblox = {}
+function Roblox:WaitForMouse()
+	local _mouse
+	repeat
+		wait()
+		_mouse = LocalPlayer:GetMouse() or nil
+	until _mouse ~= nil
+end
 
--- game list
-local games = {
-    [6284583030] = "PET SIM X";
-    [10321372166] = "PET SIM X - HARDCORE";
-    [7722306047] = "PET SIM X - TRADING PLAZA";
+-- Roblox Services
+Workspace = workspace or game:GetService("Workspace")
+Players = game:GetService("Players")
+LocalPlayer = Players.LocalPlayer
+Mouse = Roblox:WaitForMouse()
+UserInputService = game:GetService("UserInputService")
+TweenService = game:GetService("TweenService")
+HttpService = game:GetService("HttpService")
+MarketplaceService = game:GetService("MarketplaceService")
+RunService = game:GetService("RunService")
+TeleportService = game:GetService("TeleportService")
+StarterGui = game:GetService("StarterGui")
+CoreGui = game:GetService("CoreGui")
+GuiService = game:GetService("GuiService")
+Lighting = game:GetService("Lighting")
+ContextActionService = game:GetService("ContextActionService")
+NetworkClient = game:GetService("NetworkClient")
+ReplicatedStorage = game:GetService("ReplicatedStorage")
+GroupService = game:GetService("GroupService")
+PathService = game:GetService("PathfindingService")
+SoundService = game:GetService("SoundService")
+Teams = game:GetService("Teams")
+StarterPlayer = game:GetService("StarterPlayer")
+InsertService = game:GetService("InsertService")
+ChatService = game:GetService("Chat")
+ProximityPromptService = game:GetService("ProximityPromptService")
+StatsService = game:GetService("Stats")
+VirtualUser = game:GetService("VirtualUser")
+
+-- Roblox Variables
+PlaceId = game.PlaceId
+JobId = game.JobId
+
+-- Environment Methods
+SetHiddenProperty = sethiddenproperty or set_hidden_property or set_hidden_prop
+GetHidden = gethiddenproperty or get_hidden_property or get_hidden_prop
+SetSimulationRadius = setsimulationradius or set_simulation_radius
+QueueTeleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+HttpRequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+IsType = typeof
+
+-- Table Library
+ForEach = table.foreach
+Sort = table.sort
+Insert = table.insert
+
+-- String Library
+Format = string.format	
+ToLower = string.lower
+ToUpper = string.upper
+FromByte = string.byte
+SubString = string.sub
+GMatch = string.gmatch
+SplitString = function(_input, _sep)
+	if _sep == nil then
+		_sep = "%s"
+	end
+	local _t = {}
+	for _str in GMatch(_input, "([^".._sep.."]+)") do
+		Insert(_t, _str)
+	end
+	return _t
+end
+
+-- Instance Creation
+Create = function(_library, _type, _properties)
+	local _instance = _library.new(_type)
+	ForEach(_properties, function(_property, _value)
+		_instance[_property] = _value
+	end)
+	return _instance
+end
+
+-- Type Methods
+IsNumber = function(str)
+	if tonumber(str) ~= nil or str == 'inf' then
+		return true
+	end
+end
+
+--[[
+	Game Scripts
+]]
+
+Games = {
+    [6284583030] = {
+        Name = "PET SIM X";
+        Callback = function()
+            -- PSX Framework
+            local PSX = {}
+            
+        	--CollectOrbs = getmenv(LocalPlayer.PlayerScripts.Scripts.Game.Orbs).Collect
+        	--CollectLootbag = getmenv(LocalPlayer.PlayerScripts.Scripts.Game.Lootbags).Collect
+        
+        	-- Auto Collect Orbs/Lootbags
+        	local Collectables = {
+                Orbs = Workspace.__THINGS.Orbs;
+                Lootbags = Workspace.__THINGS.Lootbags;
+            }
+        	Collectables.Orbs.ChildAdded:Connect(function(_orb)
+        		if Screen.Values["auto-collect-pickups"] then
+        			--CollectOrbs({_orb})
+        			while _orb do
+        			    if _orb:FindFirstChild("Orb") then
+        			        _orb.Orb.Enabled = false  
+        			    end
+        			    _orb.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+        			    wait(.001)
+        			end
+        		end
+        	end)
+        	Collectables.Lootbags.ChildAdded:Connect(function(_bag)
+        		if Screen.Values["auto-collect-pickups"] then
+        			--CollectLootbag(_bag)
+        			while _bag do
+        			    _bag.MeshId = ""
+        			    _bag.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+        			    wait(.001)
+        			end
+        		end
+        	end)
+        
+        	Screen.Tabs.Autofarming = Screen.Window:Tab("AUTO FARMING")
+			Screen.Tabs.Autofarming:Toggle("auto collect pickups", "automatically collect coins and lootbags.", false, function(state)
+				Screen.Values["auto-collect-pickups"] = state
+			end)
+			
+			Screen.Tabs.GameModes = Screen.Window:Tab("GAME MODES")
+		    local Modes = {
+                ["normal mode"] = 6284583030;
+                ["hard mode"] = 10321372166;
+                ["trading plaza"] = 7722306047;
+            }
+            ForEach(Modes, function(i,v)
+                Screen.Tabs.GameModes:Button(i, "switched game mode to "..i, function()
+                    Flux:Notification("teleporting to "..i.." ("..v..")")
+                    wait(1)
+                    TeleportService:Teleport(v, LocalPlayer)
+                end)
+            end)
+        end
+    };
 }
 
-games.current = games[placeId] or "UNSUPPORTED GAME"
+Games[10321372166] = {
+    Name = "PET SIM X - HARDCORE";
+    Callback = Games[6284583030].Callback;
+}
 
-local window = flux:Window("HEXION", games.current, Color3.fromRGB(	153, 0, 0), Enum.KeyCode.RightShift)
-local tabs = {}
-local toggles = {}
-tabs.universal = window:Tab("UNIVERSAL")
+Games[7722306047] = {
+    Name = "PET SIM X - TRADING PLAZA";
+    Callback = Games[6284583030].Callback;
+}
 
-player.Idled:connect(function()
-    if toggles["anti-afk"] then
-        virtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+CurrentGame = Games[PlaceId] or {
+    Name = "UNSUPPORTED GAME";
+    Callback = function()
+        error("Unsupported game.")
+    end;
+}
+
+--[[
+    Launcher Script
+]]
+
+Screen = {
+	Accent = Color3.fromRGB(0, 200, 0);
+	Tabs = {};
+	Controls = {};
+	Values = {};
+}
+Screen.Window = Flux:Window("HEXION", CurrentGame.Name, Screen.Accent, Enum.KeyCode.RightShift)
+
+-- Show Notification
+Screen.Window.LoadPrompt = Flux:Notification("loading the hexion script...")
+wait(.5)
+
+-- Universal Script
+LocalPlayer.Idled:connect(function()
+    if Screen.Values["anti-afk"] then
+        VirtualUser:Button2Down(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
         wait(1)
-        virtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        VirtualUser:Button2Up(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
     end
 end)
-tabs.universal:Toggle("anti idle/afk", "prevent being kicked for being idle.", function(state)
-    toggles["anti-afk"] = state
+Screen.Tabs.Universal = Screen.Window:Tab("UNIVERSAL")
+Screen.Tabs.Universal:Toggle("remove kick for idle", "removes the kicked for idle feature.", true, function(state)
+	Screen.Values["anti-afk"] = state
 end)
-
-tabs.universal:Button("force disconnect (unsafe)", "prevent saving data.", function()
-    flux:Notification("disconencted from server!", "CONTINUE")
+Screen.Values["anti-afk"] = true
+Screen.Tabs.Universal:Button("force disconnect (unsafe)", "prevent saving data.", function()
+    Flux:Notification("disconnected from server!", "CONTINUE")
     wait(1)
     settings():GetService("NetworkSettings").IncomingReplicationLag = math.huge
 end)
-tabs.universal:Button("exit game (safe)", "saves progress and exits the game safely.", function()
-    flux:Notification("closing ROBLOX, please wait...")
+Screen.Tabs.Universal:Button("exit game (safe)", "saves progress and exits the game safely.", function()
+    Flux:Notification("closing ROBLOX, please wait...")
     wait(1)
     game:Shutdown()
 end)
-if placeId == 6284583030 or placeId == 10321372166 or placeId == 7722306047 then -- pet sim x
-    
-	local network = {}
-	network.claimOrbs = function(names)
-		return game:GetService("ReplicatedStorage")["Claim Orbs"]:FireServer(names);
-	end
-	network.claimLootbag = function(name, pos)
-		return game:GetService("ReplicatedStorage")["Collect Lootbag"]:FireServer(name, pos);
-	end
 
-    local binds = {
-        game.Workspace.__THINGS.Orbs;
-        game.Workspace.__THINGS.Lootbags;
-    }
-    game.Workspace.__THINGS.Orbs.ChildAdded:Connect(function(orb)
-		if toggles["auto-collect-orbs"] then
-			network.claimOrbs({orb.Name})
-		    if orb:FindFirstChild("Orb") then
-			    orb.Orb.Enabled = false
-			end
-		end
-	end)
-    game.Workspace.__THINGS.Lootbags.ChildAdded:Connect(function(lootbag)
-		if toggles["auto-collect-orbs"] then
-			network.claimLootbag(lootbag.Name, lootbag.Position)
-		    if lootbag:FindFirstChild("ParticleEmitter") then
-			    lootbag.ParticleEmitter.Enabled = false
-			    lootbag.MeshId = "0"
-			end
-		end
-	end)
+-- Load Script
+CurrentGame.Callback()
 
-    tabs.farming = window:Tab("AUTO FARMING")
-    tabs.farming:Toggle("auto collect orbs", "automatically collect coins.", false, function(state)
-        toggles["auto-collect-orbs"] = state
-    end)
-    tabs.farming:Toggle("auto collect lootbags", "automatically collect lootbags.", false, function(state)
-        toggles["auto-collect-lootbags"] = state
-    end)
-
-    tabs.modeSwitch = window:Tab("GAME OPTIONS")
-    local modes = {
-        ["normal mode"] = 6284583030;
-        ["hard mode"] = 10321372166;
-        ["trading plaza"] = 7722306047;
-    }
-    foreach(modes, function(i,v)
-        tabs.modeSwitch:Button(i, "switched game mode to "..i, function()
-            flux:Notification("please wait...\nteleporting to "..i.." ("..v..")")
-            wait(1)
-            teleportService:Teleport(v, player)
-        end)
-    end)
-end
-
-flux:Notification("loaded hexion successufully, latest update: fixed pet simulator x auto farming.", "CONTINUE")
+-- Hide Notification
+wait(.5)
+Screen.Window.LoadPrompt:Hide()
